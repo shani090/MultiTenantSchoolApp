@@ -1,0 +1,6 @@
+@SmartEduHub_HostAddress = http://localhost:5277
+
+GET {{SmartEduHub_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
