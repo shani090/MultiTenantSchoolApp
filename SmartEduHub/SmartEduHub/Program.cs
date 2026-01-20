@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using SmartEduHub.CommonLibrary;
 using SmartEduHub.Data;
+using SmartEduHub.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,9 @@ builder.Services.AddDbContext<SchoolDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddApplicationServices();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddScoped<ITenantContextAccessor, TenantContextAccessor>();
 
 var app = builder.Build();
 
@@ -18,7 +23,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseMiddleware<TenantMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
