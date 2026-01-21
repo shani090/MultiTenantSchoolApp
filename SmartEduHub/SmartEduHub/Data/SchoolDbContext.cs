@@ -30,6 +30,8 @@ public partial class SchoolDbContext : DbContext
 
     public virtual DbSet<Result> Results { get; set; }
 
+    public virtual DbSet<RevokedToken> RevokedTokens { get; set; }
+
     public virtual DbSet<Section> Sections { get; set; }
 
     public virtual DbSet<Student> Students { get; set; }
@@ -37,6 +39,8 @@ public partial class SchoolDbContext : DbContext
     public virtual DbSet<Teacher> Teachers { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserClaim> UserClaims { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=ConnectionStrings:Default");
@@ -197,6 +201,19 @@ public partial class SchoolDbContext : DbContext
                 .HasConstraintName("FK_Results_Students");
         });
 
+        modelBuilder.Entity<RevokedToken>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__RevokedT__3214EC071518FF24");
+
+            entity.Property(e => e.RevokedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.Token).HasMaxLength(500);
+
+            entity.HasOne(d => d.User).WithMany(p => p.RevokedTokens)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RevokedTokens_Users");
+        });
+
         modelBuilder.Entity<Section>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Sections__3214EC0744A1649E");
@@ -304,6 +321,20 @@ public partial class SchoolDbContext : DbContext
             entity.HasOne(d => d.College).WithMany(p => p.Users)
                 .HasForeignKey(d => d.CollegeId)
                 .HasConstraintName("FK_Users_Colleges");
+        });
+
+        modelBuilder.Entity<UserClaim>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserClai__3214EC070A54B084");
+
+            entity.Property(e => e.ClaimType).HasMaxLength(100);
+            entity.Property(e => e.ClaimValue).HasMaxLength(100);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserClaims)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserClaims_Users");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -8,6 +8,7 @@ namespace SmartEduHub.Data
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IUser, AuthRepository>();
+            services.AddScoped<IColleges, CollegesServices> ();
             return services;
         }
         

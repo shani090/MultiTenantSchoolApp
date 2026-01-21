@@ -29,7 +29,11 @@ public partial class User
 
     public virtual College? College { get; set; }
 
+    public virtual ICollection<RevokedToken> RevokedTokens { get; set; } = new List<RevokedToken>();
+
     public virtual ICollection<Student> Students { get; set; } = new List<Student>();
 
     public virtual ICollection<Teacher> Teachers { get; set; } = new List<Teacher>();
+
+    public virtual ICollection<UserClaim> UserClaims { get; set; } = new List<UserClaim>();
 }

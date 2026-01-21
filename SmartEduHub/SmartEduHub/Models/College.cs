@@ -25,6 +25,8 @@ public partial class College
 
     public string? CreatedBy { get; set; }
 
+    public long? UpdatedBy { get; set; }
+
     public virtual ICollection<AcademicYear> AcademicYears { get; set; } = new List<AcademicYear>();
 
     public virtual ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartEduHub.DTO;
 using SmartEduHub.Interface;
 
@@ -65,5 +66,52 @@ namespace SmartEduHub.Controllers
                 return StatusCode(500, new { status = "error", message = ex.Message });
             }
         }
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> login([FromBody] UserLoginDto loginDto)
+        {
+            try
+            {
+                if (loginDto == null || string.IsNullOrWhiteSpace(loginDto.username) ||
+                string.IsNullOrWhiteSpace(loginDto.PasswordHash))
+                {
+                    return BadRequest(new { status = "error", message = "Email/Phone and password are required" });
+                }
+                var authResult = await _user.LoginAsync(loginDto);
+
+
+                return Ok(new
+                {
+                    authResult
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while registering a user.");
+                return StatusCode(500, new { status = "error", message = ex.Message });
+            }
+        }
+
+        [HttpGet("secure")]
+        [Authorize]
+        public async Task<IActionResult> SecureEndpoint()
+        {
+            try
+            {
+                var result = await _user.GetSecureDataAsync(User);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                _logger.LogWarning(uaEx, "Unauthorized access in SecureEndpoint");
+                return Unauthorized(new { status = "error", message = uaEx.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in SecureEndpoint for user {UserId}", User.FindFirst("UserId")?.Value);
+                return StatusCode(500, new { status = "error", message = "An internal server error occurred" });
+            }
+        }
+
     }
 }
